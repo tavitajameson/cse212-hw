@@ -1,17 +1,21 @@
+using System;
+using System.Collections.Generic;
+
 public class Translator
 {
+    private Dictionary<string, string> _words = new();
+
     public static void Run()
     {
         var englishToGerman = new Translator();
         englishToGerman.AddWord("House", "Haus");
         englishToGerman.AddWord("Car", "Auto");
         englishToGerman.AddWord("Plane", "Flugzeug");
-        Console.WriteLine(englishToGerman.Translate("Car")); // Auto
-        Console.WriteLine(englishToGerman.Translate("Plane")); // Flugzeug
-        Console.WriteLine(englishToGerman.Translate("Train")); // ???
-    }
 
-    private Dictionary<string, string> _words = new();
+        Console.WriteLine(englishToGerman.Translate("Car"));    // Auto
+        Console.WriteLine(englishToGerman.Translate("Plane"));  // Flugzeug
+        Console.WriteLine(englishToGerman.Translate("Train"));  // ???
+    }
 
     /// <summary>
     /// Add the translation from 'from_word' to 'to_word'
@@ -25,6 +29,7 @@ public class Translator
     public void AddWord(string fromWord, string toWord)
     {
         // ADD YOUR CODE HERE
+        _words[fromWord] = toWord;
     }
 
     /// <summary>
@@ -35,6 +40,19 @@ public class Translator
     public string Translate(string fromWord)
     {
         // ADD YOUR CODE HERE
-        return "";
+        if (_words.TryGetValue(fromWord, out string translatedWord))
+        {
+            return translatedWord;
+        }
+
+        return "???";
+    }
+}
+
+public class Program
+{
+    public static void Main()
+    {
+        Translator.Run();
     }
 }
