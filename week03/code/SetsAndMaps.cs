@@ -8,7 +8,6 @@ public static class SetsAndMaps
     /// solution for returning all symmetric pairs of words.  
     ///
     /// For example, if words was: [am, at, ma, if, fi], we would return :
-    ///
     /// ["am & ma", "if & fi"]
     ///
     /// The order of the array does not matter, nor does the order of the specific words in each string in the array.
@@ -21,8 +20,36 @@ public static class SetsAndMaps
     /// <param name="words">An array of 2-character words (lowercase, no duplicates)</param>
     public static string[] FindPairs(string[] words)
     {
-        // TODO Problem 1 - ADD YOUR CODE HERE
-        return [];
+        var seen = new HashSet<string>();
+        var results = new List<string>();
+
+        foreach (var w in words)
+        {
+            if (string.IsNullOrEmpty(w) || w.Length != 2)
+                continue;
+
+            // Special case: identical letters like "aa" should never match
+            if (w[0] == w[1])
+            {
+                // still add (harmless) so we don't repeat work if duplicates exist
+                seen.Add(w);
+                continue;
+            }
+
+            // If duplicates exist (perf test does), ignore repeats safely
+            if (!seen.Add(w))
+                continue;
+
+            // Reverse the two letters
+            var rev = new string(new[] { w[1], w[0] });
+
+            if (seen.Contains(rev))
+            {
+                results.Add($"{w} & {rev}");
+            }
+        }
+
+        return results.ToArray();
     }
 
     /// <summary>
@@ -35,14 +62,21 @@ public static class SetsAndMaps
     /// file.
     /// </summary>
     /// <param name="filename">The name of the file to read</param>
-    /// <returns>fixed array of divisors</returns>
     public static Dictionary<string, int> SummarizeDegrees(string filename)
     {
         var degrees = new Dictionary<string, int>();
+
         foreach (var line in File.ReadLines(filename))
         {
             var fields = line.Split(",");
-            // TODO Problem 2 - ADD YOUR CODE HERE
+            if (fields.Length < 4) continue;
+
+            var degree = fields[3].Trim();
+
+            if (degrees.ContainsKey(degree))
+                degrees[degree]++;
+            else
+                degrees[degree] = 1;
         }
 
         return degrees;
@@ -53,36 +87,46 @@ public static class SetsAndMaps
     /// is when the same letters in a word are re-organized into a 
     /// new word.  A dictionary is used to solve the problem.
     /// 
-    /// Examples:
-    /// is_anagram("CAT","ACT") would return true
-    /// is_anagram("DOG","GOOD") would return false because GOOD has 2 O's
-    /// 
-    /// Important Note: When determining if two words are anagrams, you
-    /// should ignore any spaces.  You should also ignore cases.  For 
-    /// example, 'Ab' and 'Ba' should be considered anagrams
-    /// 
-    /// Reminder: You can access a letter by index in a string by 
-    /// using the [] notation.
+    /// Important Note: Ignore spaces and ignore case.
     /// </summary>
     public static bool IsAnagram(string word1, string word2)
     {
-        // TODO Problem 3 - ADD YOUR CODE HERE
-        return false;
+        var counts = new Dictionary<char, int>();
+
+        // Count letters in word1
+        foreach (char c in word1)
+        {
+            if (c == ' ') continue;
+            char key = char.ToLowerInvariant(c);
+
+            if (counts.ContainsKey(key))
+                counts[key]++;
+            else
+                counts[key] = 1;
+        }
+
+        // Subtract letters in word2
+        foreach (char c in word2)
+        {
+            if (c == ' ') continue;
+            char key = char.ToLowerInvariant(c);
+
+            if (!counts.TryGetValue(key, out int val))
+                return false;
+
+            val--;
+            if (val == 0)
+                counts.Remove(key);
+            else
+                counts[key] = val;
+        }
+
+        return counts.Count == 0;
     }
 
     /// <summary>
-    /// This function will read JSON (Javascript Object Notation) data from the 
-    /// United States Geological Service (USGS) consisting of earthquake data.
-    /// The data will include all earthquakes in the current day.
-    /// 
-    /// JSON data is organized into a dictionary. After reading the data using
-    /// the built-in HTTP client library, this function will return a list of all
-    /// earthquake locations ('place' attribute) and magnitudes ('mag' attribute).
-    /// Additional information about the format of the JSON data can be found 
-    /// at this website:  
-    /// 
-    /// https://earthquake.usgs.gov/earthquakes/feed/v1.0/geojson.php
-    /// 
+    /// Reads earthquake JSON data from USGS and returns formatted strings:
+    /// "place - Mag magnitude"
     /// </summary>
     public static string[] EarthquakeDailySummary()
     {
@@ -92,15 +136,24 @@ public static class SetsAndMaps
         using var jsonStream = client.Send(getRequestMessage).Content.ReadAsStream();
         using var reader = new StreamReader(jsonStream);
         var json = reader.ReadToEnd();
-        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
 
+        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
         var featureCollection = JsonSerializer.Deserialize<FeatureCollection>(json, options);
 
-        // TODO Problem 5:
-        // 1. Add code in FeatureCollection.cs to describe the JSON using classes and properties 
-        // on those classes so that the call to Deserialize above works properly.
-        // 2. Add code below to create a string out each place a earthquake has happened today and its magitude.
-        // 3. Return an array of these string descriptions.
-        return [];
+        if (featureCollection?.Features == null || featureCollection.Features.Count == 0)
+            return [];
+
+        var results = new List<string>(featureCollection.Features.Count);
+
+        foreach (var f in featureCollection.Features)
+        {
+            var place = f?.Properties?.Place ?? "Unknown location";
+            var mag = f?.Properties?.Mag;
+
+            string magText = mag.HasValue ? mag.Value.ToString() : "N/A";
+            results.Add($"{place} - Mag {magText}");
+        }
+
+        return results.ToArray();
     }
 }
