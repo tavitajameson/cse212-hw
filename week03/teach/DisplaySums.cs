@@ -1,33 +1,32 @@
-﻿public static class DisplaySums {
-    public static void Run() {
-        DisplaySumPairs([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
-        // Should show something like (order does not matter):
-        // 6 4
-        // 7 3
-        // 8 2
-        // 9 1 
+﻿using System;
+using System.Collections.Generic;
 
-        Console.WriteLine("------------");
-        DisplaySumPairs([-20, -15, -10, -5, 0, 5, 10, 15, 20]);
-        // Should show something like (order does not matter):
-        // 10 0
-        // 15 -5
-        // 20 -10
+public class DisplaySums
+{
+    // Finds and displays all pairs that sum to 10 in O(n) time using a set.
+    // Assumption from assignment: numbers contains no duplicates.
+    public static void DisplaySumPairs(List<int> numbers)
+    {
+        var seen = new HashSet<int>();
 
-        Console.WriteLine("------------");
-        DisplaySumPairs([5, 11, 2, -4, 6, 8, -1]);
-        // Should show something like (order does not matter):
-        // 8 2
-        // -1 11
+        foreach (int x in numbers)
+        {
+            int need = 10 - x;
+
+            if (seen.Contains(need))
+            {
+                // Print the pair once (e.g., "3 + 7 = 10")
+                Console.WriteLine($"{need} + {x} = 10");
+            }
+
+            seen.Add(x);
+        }
     }
 
-    /// <summary>
-    /// Display pairs of numbers (no duplicates should be displayed) that sum to
-    /// 10 using a set in O(n) time.  We are assuming that there are no duplicates
-    /// in the list.
-    /// </summary>
-    /// <param name="numbers">array of integers</param>
-    private static void DisplaySumPairs(int[] numbers) {
-        // TODO Problem 2 - This should print pairs of numbers in the given array
+    // If your project expects a Run() entry, include this:
+    public static void Run()
+    {
+        var numbers = new List<int> { 1, 9, 3, 7, 5, 2, 8, 4, 6 };
+        DisplaySumPairs(numbers);
     }
 }
