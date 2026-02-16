@@ -6,30 +6,26 @@ public class Node
 
     public Node(int data)
     {
-        this.Data = data;
+        Data = data;
     }
 
+    // Problem 1: Insert unique values only
     public void Insert(int value)
     {
-        // TODO Start Problem 1
+        if (value == Data)
+            return; // ✅ no duplicates
 
         if (value < Data)
         {
             // Insert to the left
-            if (value == Data)
-                return; // no duplicates
-            if (value < Data)
-            {
-                if (Left is null)
-                    Left = new Node(value);
-                else
-                    Left.Insert(value);
-            }
+            if (Left is null)
+                Left = new Node(value);
             else
                 Left.Insert(value);
         }
-        else
+        else // value > Data
         {
+            // Insert to the right
             if (Right is null)
                 Right = new Node(value);
             else
@@ -37,6 +33,7 @@ public class Node
         }
     }
 
+    // Problem 2: Contains
     public bool Contains(int value)
     {
         if (value == Data)
@@ -47,6 +44,8 @@ public class Node
 
         return Right is not null && Right.Contains(value);
     }
+
+    // Problem 4: Tree Height
     public int GetHeight()
     {
         int leftHeight = Left?.GetHeight() ?? 0;

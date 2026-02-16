@@ -11,15 +11,13 @@ public class BinarySearchTree : IEnumerable<int>
     /// </summary>
     public void Insert(int value)
     {
-        // If the tree is empty, set the root.
         if (_root is null)
         {
             _root = new Node(value);
         }
         else
         {
-            // Node.Insert enforces "no duplicates" (Problem 1)
-            _root.Insert(value);
+            _root.Insert(value); // Node.Insert enforces uniqueness
         }
     }
 
@@ -32,7 +30,7 @@ public class BinarySearchTree : IEnumerable<int>
     }
 
     /// <summary>
-    /// Yields all values in the tree (in-order traversal)
+    /// Yields all values in the tree
     /// </summary>
     IEnumerator IEnumerable.GetEnumerator()
     {
@@ -40,14 +38,16 @@ public class BinarySearchTree : IEnumerable<int>
     }
 
     /// <summary>
-    /// Iterate forward through the BST (smallest to largest)
+    /// Iterate forward through the BST
     /// </summary>
     public IEnumerator<int> GetEnumerator()
     {
         var numbers = new List<int>();
         TraverseForward(_root, numbers);
         foreach (var number in numbers)
+        {
             yield return number;
+        }
     }
 
     private void TraverseForward(Node? node, List<int> values)
@@ -61,17 +61,19 @@ public class BinarySearchTree : IEnumerable<int>
     }
 
     /// <summary>
-    /// Iterate backward through the BST (largest to smallest)
+    /// Iterate backward through the BST.
     /// </summary>
     public IEnumerable Reverse()
     {
         var numbers = new List<int>();
         TraverseBackward(_root, numbers);
         foreach (var number in numbers)
+        {
             yield return number;
+        }
     }
 
-    // Problem 3
+    // Problem 3: Traverse Backwards
     private void TraverseBackward(Node? node, List<int> values)
     {
         if (node is not null)
